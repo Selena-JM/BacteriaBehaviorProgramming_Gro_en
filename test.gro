@@ -1,0 +1,11 @@
+include gro
+
+set ( "dt", 0.1 ); // fast and inaccurate
+
+program p() := {
+
+  skip(); 
+
+};
+
+ecoli ( [ x := 0, y := 0 ], program p() );
