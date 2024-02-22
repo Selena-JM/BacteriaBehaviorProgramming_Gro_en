@@ -1,0 +1,111 @@
+/////////////////////////////////////////////////////////////
+// 
+//                       B A N N
+// 
+//   Bacterial Artificial Neural Network (05.03.2021)
+//
+//  Modeling and optimization of poly(3-hydroxybutyrateco-
+//  3-hydroxyvalerate) production process according to the
+//  paper Zafar et al. Bioresource Technology 104 (2012) 631–641.
+//
+//         A. Gargantilla Becerra , R. Lahoz-Beltra
+//                                                          
+//   THIS SCRIPT IS PROVIDED BY THE AUTHOR "AS IS" AND      
+//   CAN BE USED BY ANYONE FOR THE PURPOSES OF EDUCATION    
+//   AND RESEARCH.  
+//
+/////////////////////////////////////////////////////////////
+include gro
+
+//Experimental set up
+
+molasses_range:={1.50,7.50};
+urea_range:={0.50,1.50};
+propionic_acid_range:={10.00,50.00};
+phb_range:={2.5,6.75};
+
+//Artificial neural network parameters
+
+w_i_1:={-0.8761,-0.1543,0.4184};
+w_i_2:={-9.2423,2.1559,0.5502};
+w_i_3:={-1.2167,-2.2256,0.3593};
+
+w_h_1:={-1.1652,0.4563,0.6264};
+w_h_2:={0.4272,-0.2029,-0.6274};
+w_h_3:={2.3147,0.4147,2.5255};
+w_h_4:={-3.0707,-0.3121,-0.2564};
+
+w_o:={ -0.9643,-1.6782,-0.5076,0.5819};
+
+b_i:={0.9966,0.4541,0.3147};
+b_h:={1.2547,-1.6508,1.4789,-1.0983};
+b_o:=-0.0358;
+
+//Gro parameters
+gene:={0,0,0};
+antibiotic := signal(0, 0);
+fp := fopen ( "output_phb.csv", "w" );
+evaluation :=0;
+e :=2.71828;
+
+//Transfer functions
+fun tansig i .
+  (2/(1 + (e^(-2*i))))-1;
+
+fun purelin h .
+ h;
+
+//Data normalization
+fun norm x range .
+  0.8*((x-range[0])/(range[1]-range[0]))+0.1;
+
+//Selection function
+fun comparative g r .
+  if g-r[0]>0 & g-r[1]<0 
+    then 1
+    else 0
+  end;
+
+//Artificial neural network program
+program ANN() :={
+  gfp:=0;
+  t:=0;
+  true:{t:= t+dt }
+  inputw_i:={0.0,0.0,0.0};
+  inputw_h:={0.0,0.0,0.0,0.0};
+  y:=0;
+  phb:=0;
+
+  daughter : { gene[0]:= 4.29,
+  	       gene[1]:= rand(150)/100.0,
+	       gene[2]:= rand(5000)/100.0,
+	       evaluation := comparative (gene[0]) (molasses_range) * comparative (gene[1]) (urea_range) * comparative (gene[2]) (propionic_acid_range)
+	     }
+
+  daughter & evaluation = 0 & get_signal(antibiotic)>-0.01 :{ die()}
+
+  daughter & evaluation = 1 : { fprint (fp, gene[0]," ",gene[1]," ",gene[2]," "),
+  	           	gene[0] := norm (gene[0]) (molasses_range),
+				gene[1] := norm (gene[1]) (urea_range),
+				gene[2] := norm (gene[2]) (propionic_acid_range),
+				inputw_i[0] := purelin((gene[0]*w_i_1[0])+(gene[1]*w_i_1[1])+(gene[2]*w_i_1[2])+b_i[0]),
+				inputw_i[1] := purelin((gene[0]*w_i_2[0])+(gene[1]*w_i_2[1])+(gene[2]*w_i_2[2])+b_i[1]),
+				inputw_i[2] := purelin((gene[0]*w_i_3[0])+(gene[1]*w_i_3[1])+(gene[2]*w_i_3[2])+b_i[2]),
+				inputw_h[0] := tansig((w_h_1[0]*inputw_i[0])+(w_h_1[1]*inputw_i[1])+(w_h_1[2]*inputw_i[2])+b_h[0]),
+				inputw_h[1] := tansig((w_h_2[0]*inputw_i[0])+(w_h_2[1]*inputw_i[1])+(w_h_2[2]*inputw_i[2])+b_h[1]),
+				inputw_h[2] := tansig((w_h_3[0]*inputw_i[0])+(w_h_3[1]*inputw_i[1])+(w_h_3[2]*inputw_i[2])+b_h[2]),
+				inputw_h[3] := tansig((w_h_4[0]*inputw_i[0])+(w_h_4[1]*inputw_i[1])+(w_h_4[2]*inputw_i[2])+b_h[3]),
+				y := purelin((w_o[0]*inputw_h[0])+(w_o[1]*inputw_h[1])+(w_o[2]*inputw_h[2])+(w_o[3]*inputw_h[3])+b_o),
+				phb := (((phb_range[1]-phb_range[0])*(y-0.1))/0.8)+phb_range[0],
+				gfp:=phb*50,
+				// fprint (fp, phb, "\n" ),
+				print("phb = ", phb," molasses = ",gene[0]," urea = ",gene[1]," propionic acid = ",gene[2]),
+				fprint(fp, phb, gene[0], gene[1], gene[2], "\n"),
+			      }
+    foreach i in range 1200 do {
+      set_signal(antibiotic,rand(180),(rand(360)-180),20)
+    }end;
+};
+
+ecoli ( [], program ANN() );
+
