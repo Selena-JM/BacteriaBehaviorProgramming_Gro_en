@@ -1,0 +1,32 @@
+What I understand of Gro language from reading the original paper's code 
+
+To define something use :=
+
+To test equality use =
+
+Finish all lines decalarations by ; (not every line but only when finished a declaration, a function or anything)
+
+
+You can use gro functions 
+    signal
+    reaction
+    etc
+
+
+Functions are not the same as programs 
+    Functions : declare with "fun" then the name and then the arguments an then a dot 
+    EX : "fun puissance a n ." will declare the function "puissance" with the arguments a and n.
+    Need an 'end;' at the end of the function
+
+    Programs : is a set of initializers and guarded commands within a set of curly brackets. For example, here is
+    a program that has one initializer for the variable t, and two guarded commands: one that updates t, and 
+    another that resets it if it gets too big.
+	
+        program p(x) := {
+
+            t := 0;
+
+            true :   { t := t + dt }
+            t >= x : { t := 0      }
+
+        };
