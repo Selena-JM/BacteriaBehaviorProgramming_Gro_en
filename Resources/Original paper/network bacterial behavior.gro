@@ -47,7 +47,7 @@ f_c := signal(4, 0.4);
 d := signal(4, 0.1);
 bac := signal(4, 0.1);
 com := signal(4, 0.1);
-oxy := signal(10, 0.1);
+oxy := signal(10, 0.1); 
 response:=signal(4,0.1);
 e := signal(4,0.1);
 //
@@ -298,7 +298,7 @@ program main() := {
 
   total = dt : {ecoli ([x:=-235, y:=5], program ANN())}
   
-  count >= 1 : {Y:= maptocells yfp/volume end,
+  count >= 1 : {Y:= maptocells yfp/volume end, // Don't understand the "end" --> maybe to say its the end of the function call
        	         movility := data Y ,
 		 B:= maptocells cfp/volume end,
        	         aerobic := data B ,

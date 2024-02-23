@@ -10,7 +10,15 @@ Finish all lines decalarations by ; (not every line but only when finished a dec
 You can use gro functions 
     signal
     reaction
-    etc
+    map_to_cells : ifunction called either with 
+        expression : applies the expression to all bacteria ?
+        list and scope ? : ? 
+
+Parameters 
+    volume : This number is set to the cell's current volume, in femtoliters.
+
+Reporters 
+    Color intensity is a function of gfp (or rfp or yfp or cfp) and the cell volume
 
 
 Functions are not the same as programs 
