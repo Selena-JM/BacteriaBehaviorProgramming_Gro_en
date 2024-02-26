@@ -1,0 +1,253 @@
+include gro
+
+// Neural network parameters
+// To complete
+
+// Gro parameters
+environment:={0,0,0,0};
+fp := fopen ( "output_response.csv", "w" );
+detection :=0.15;
+urea_range:={0.50,1.50};//To complete
+
+// Environmental model simulating the presence of infection factors or not
+// 
+// qs: AI-2 (quorum sensing); u: urea;
+// toxins: virulence factor; sider: catabolic enzyme
+
+qs := signal(4, 0.1);
+toxins := signal(4, 0.1);
+sider := signal(4, 0.1);
+urea := signal(0, 0.0); 
+
+
+//Selection function to compare to urea range
+fun comparative g r .
+  if g-r[0]>0 & g-r[1]<0 
+    then 1
+    else 0
+  end;
+
+
+// Bacterial behavior model
+//behavior:= {0,0,0,0};
+behavior := 0;
+fun data L .
+  let n := length(L), mu := ( sumlist L ) / n in
+    [
+      num := n ,
+      mean := mu ,
+      std := sqrt ( sumlist ( map ( \ x . (x-mu)^2 ) L ) / n )
+    ]
+  end;
+
+// Detection function 
+fun detect i .
+  if i > detection
+    then 1
+    else 0
+  end;
+
+
+// Biological responses 
+// To complete
+
+
+//Artificial neural network program
+// Risk 0 : no fluorescence
+// Risk 1 : gfp
+// Risk 2 : cfp
+// Risk 3 : yfP
+// Risk 4 : cfp 
+
+program ANN() :={
+  s:=[e:=environment ,score:=0.0,c:=behavior];
+  gfp:=0;
+  rfp:=0;
+  yfp:=0;
+  cfp:=0;
+  
+  t:=0;
+  rep:=0;
+  count:=0;
+  m1:=0;
+  m2:=0;
+  Y:={};
+  movility:= [ num := 0, mean := 0, std := 0 ];
+
+// No need to emit signals, we don't want the programmed bacteria to sense each other and there is no commensalism
+// This is evaluated at each update of each cell
+  true:{t:= t+dt,
+        rep:= rep+dt,
+	 	count:=count+dt,
+		set_signal(qs,rand(400)-100,rand(500)-250, 5),
+		set_signal(toxins,rand(500)-250,(rand(500)-250),5),
+		set_signal(sider,rand(500)-250,(rand(500)-250),5)
+       }
+       
+  // t > 0.25 : { t := 0, m1:=m2, m2:= get_signal(d)}
+
+// s.e[0]: bacterium detects AI-2;        s.e[1]: bacterium detects urea in dangerous scope;
+// s.e[2]: bacterium detects toxins;      s.e[3]: bacterium detects siderophores;
+//
+// s.c[0]: no fluorescence;   s.c[1]: gfp;
+// s.c[2]: cfp;               s.c[3]: yfp;    s.c[4]: rfp;
+
+  rep >= 0.5 :{ s.e[0]:=detect(get_signal(qs)),
+                s.e[1]:=comparative (get_signal(urea)) urea_range,
+              	s.e[2]:=detect(get_signal(toxins)),
+              	s.e[3]:=detect(get_signal(sider)),
+	        	//s.c[0] :=relu((s.e[0]*w_1[0])+(s.e[1]*w_1[1])+(s.e[2]*w_1[2])+(s.e[3]*w_1[3])), // relu is natural here since if the sum is negative is corresponds to an absence of response, not a negative response
+	        	//s.c[1] :=relu((s.e[0]*w_2[0])+(s.e[1]*w_2[1])+(s.e[2]*w_2[2])+(s.e[3]*w_2[3])),
+	        	//s.c[2] :=relu((s.e[0]*w_3[0])+(s.e[1]*w_3[1])+(s.e[2]*w_3[2])+(s.e[3]*w_3[3])),
+	        	//s.c[3] :=relu((s.e[0]*w_4[0])+(s.e[1]*w_4[1])+(s.e[2]*w_4[2])+(s.e[3]*w_4[3])),
+				s.c := s.e[0]+s.e[1]+s.e[2]+s.e[3],
+	        	rep := 0
+               }
+
+  //daughter :  { fprint (fp, s.e,",",s.c,"\n" ) }
+
+// Bacterial behavior table
+//
+  s.e[0]=0 & s.e[1]=0 & s.e[2]=0 & s.e[3]=0 :{s.c:=1, 
+								gfp:=0,
+								cfp:=0,
+								yfp:=0,
+								rfp:=0
+                            	}
+  s.e[0]=1 & s.e[1]=0 & s.e[2]=0 & s.e[3]=0 :{s.c:=1, 
+								gfp:=1000,
+								cfp:=0,
+								yfp:=0,
+								rfp:=0
+                            	}
+  s.e[0]=0 & s.e[1]=1 & s.e[2]=0 & s.e[3]=0 :{s.c:=1, 
+								gfp:=1000,
+								cfp:=0,
+								yfp:=0,
+								rfp:=0
+                            	}
+  s.e[0]=0 & s.e[1]=0 & s.e[2]=1 & s.e[3]=0 :{s.c:=1, 
+								gfp:=1000,
+								cfp:=0,
+								yfp:=0,
+								rfp:=0
+                            	}
+  s.e[0]=0 & s.e[1]=0 & s.e[2]=0 & s.e[3]=1 :{s.c:=1, 
+								gfp:=1000,
+								cfp:=0,
+								yfp:=0,
+								rfp:=0
+                            	}
+  s.e[0]=1 & s.e[1]=1 & s.e[2]=0 & s.e[3]=0 :{s.c:=1, 
+								gfp:=0,
+								cfp:=1000,
+								yfp:=0,
+								rfp:=0
+                            	}
+  
+  s.e[0]=1 & s.e[1]=0 & s.e[2]=1 & s.e[3]=0 :{s.c:=1, 
+								gfp:=0,
+								cfp:=1000,
+								yfp:=0,
+								rfp:=0
+                            	}
+  s.e[0]=1 & s.e[1]=0 & s.e[2]=0 & s.e[3]=1 :{s.c:=1, 
+								gfp:=0,
+								cfp:=1000,
+								yfp:=0,
+								rfp:=0
+                            	}
+  s.e[0]=0 & s.e[1]=1 & s.e[2]=1 & s.e[3]=0 :{s.c:=1, 
+								gfp:=0,
+								cfp:=1000,
+								yfp:=0,
+								rfp:=0
+                            	}
+  s.e[0]=0 & s.e[1]=1 & s.e[2]=0 & s.e[3]=1 :{s.c:=1, 
+								gfp:=0,
+								cfp:=1000,
+								yfp:=0,
+								rfp:=0
+                            	}
+  s.e[0]=0 & s.e[1]=0 & s.e[2]=1 & s.e[3]=1 :{s.c:=1, 
+								gfp:=0,
+								cfp:=1000,
+								yfp:=0,
+								rfp:=0
+                            	}
+  s.e[0]=1 & s.e[1]=1 & s.e[2]=1 & s.e[3]=0 :{s.c:=1, 
+								gfp:=0,
+								cfp:=0,
+								yfp:=1000,
+								rfp:=0
+                            	}
+  s.e[0]=1 & s.e[1]=1 & s.e[2]=0 & s.e[3]=1 :{s.c:=1, 
+								gfp:=0,
+								cfp:=0,
+								yfp:=1000,
+								rfp:=0
+                            	}
+  s.e[0]=0 & s.e[1]=1 & s.e[2]=1 & s.e[3]=1 :{s.c:=1, 
+								gfp:=0,
+								cfp:=0,
+								yfp:=1000,
+								rfp:=0
+                            	}
+  s.e[0]=1 & s.e[1]=0 & s.e[2]=1 & s.e[3]=1 :{s.c:=1, 
+								gfp:=0,
+								cfp:=0,
+								yfp:=1000,
+								rfp:=0
+                            	}
+  s.e[0]=1 & s.e[1]=1 & s.e[2]=1 & s.e[3]=1 :{s.c:=1, 
+								gfp:=0,
+								cfp:=0,
+								yfp:=0,
+								rfp:=1000
+                            	}
+
+
+  selected  : {print(s.e," ",s.c," ",get_signal(urea))} //To complete
+
+// This will set a lot of signals coming from everywhere but juste one time at the beginning of the simulation
+  foreach i in range 1200 do {
+    set_signal(urea,rand(500)-250,(rand(500)-250),5), //set_signal(signal_name, location_x, location_y, concentration)
+	set_signal(toxins,rand(500)-250,(rand(500)-250),5),
+	set_signal(sider,rand(500)-250,(rand(500)-250),5),
+	set_signal(qs,rand(500)-250,(rand(500)-250),5)
+  }end; // To complete and refine the numbers especially the concentrations
+};
+
+program main() := {
+  count:=0;
+  total:=0;
+  Y:={};
+  risk3:= [ num := 0, mean := 0, std := 0 ];
+  B:={};
+  risk2:= [ num := 0, mean := 0, std := 0 ];
+  R:={};
+  risk4:= [ num := 0, mean := 0, std := 0 ];
+  G:={};
+  risk1:= [ num := 0, mean := 0, std := 0 ];
+ 
+  true : { count := count + dt,
+       	   total := total + dt
+	 }
+
+  total = dt : {ecoli ([x:=-235, y:=5], program ANN())}
+  
+  count >= 1 : {Y:= maptocells yfp/volume end, // Don't understand the "end" --> maybe to say its the end of the function call
+       	         risk3 := data Y ,
+		 B:= maptocells cfp/volume end,
+       	         risk2 := data B ,
+		 R:= maptocells rfp/volume end,
+       	         risk4 := data R ,
+		 G:= maptocells gfp/volume end,
+       	         risk1 := data G ,
+			 print("cell count = ",risk3.num," mean risk3 = ",risk3.mean," mean risk2 = ",risk2.mean," mean risk4 = ",risk4.mean," mean risk1 = ",risk1.mean),
+	         fprint (fp,risk3.num,",",risk3.mean,",",risk2.mean,",",risk4.mean,",",risk1.mean,"\n" ),
+		 count:=0
+	       }
+  // total>=45.1 :{exit()}
+};
+

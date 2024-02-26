@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 from sklearn import tree
 from sklearn.tree import _tree
 from sklearn.metrics import accuracy_score
+from sklearn.linear_model import LinearRegression
 
 
 ### Data creation 
@@ -32,15 +33,16 @@ X = [[0, 0, 0,	0],
 Y_cat = [0, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4]
 
 Y = [[0,0,0,0], [1,0,0,0], [1,0,0,0], [1,0,0,0], [1,0,0,0], [0,1,0,0], [0,1,0,0], [0,1,0,0], [0,1,0,0], [0,1,0,0], [0,1,0,0], [0,0,1,0], [0,0,1,0], [0,0,1,0], [0,0,1,0], [0,0,0,1]]
-Ybis = Y = [[1,0,0,0,0], [0,1,0,0,0], [0,1,0,0,0], [0,1,0,0,0], [0,1,0,0,0], [0,0,1,0,0], [0,0,1,0,0], [0,0,1,0,0], [0,0,1,0,0], [0,0,1,0,0], [0,0,1,0,0], [0,0,0,1,0], [0,0,0,1,0], [0,0,0,1,0], [0,0,0,1,0], [0,0,0,0,1]]
+Ybis = [[1,0,0,0,0], [0,1,0,0,0], [0,1,0,0,0], [0,1,0,0,0], [0,1,0,0,0], [0,0,1,0,0], [0,0,1,0,0], [0,0,1,0,0], [0,0,1,0,0], [0,0,1,0,0], [0,0,1,0,0], [0,0,0,1,0], [0,0,0,1,0], [0,0,0,1,0], [0,0,0,1,0], [0,0,0,0,1]]
 
 X_test = [X[i] for i in [0,5,9,15]]
 
 Y_test = [Y[i] for i in [0,5,9,15]]
+Y_test_cat = [Y_cat[i] for i in [0,5,9,15]]
 Y_test_bis = [Ybis[i] for i in [0,5,9,15]]
 
 
-### Trying with decision trees 
+### Decision tree 
 # Of course this method gives perfect results because the training table is complete and gives all the 
 # possible input-output
 
@@ -126,40 +128,72 @@ def decision_tree_method(X, Y, cat=True,show=False):
         print(r)
 
 
-decision_tree_method(X, Y_cat, cat=True, show=False)
+# decision_tree_method(X, Y_cat, cat=True, show=False)
 
-### Trying to solve the linear equations 
+### Linear equations 
 def linear_eq_solving_method(X, Y):
     A, residuals, rank, s = np.linalg.lstsq(X, Y, rcond=None)
     print(A)
 
     print(np.dot(A,np.reshape(X[5], (4,1)))) #Not satisfactory
+    print(residuals)
 
-# method does not give satisfactory results
+# method does not give satisfactory results with vectors
 A=[[0.05, 0.15, 0.15, 0.05],
     [0.05, 0.15, 0.15, 0.05],
     [0.05, 0.15, 0.15, 0.05],
     [0.05, 0.15, 0.15, 0.05]]
 
+# of course with categories it works perfectly with A = [1. 1. 1. 1.]
+#linear_eq_solving_method(X, Y)
+
+### Linear regression
+# of course it works perfectly with categories : coeffs = [1,1,1,1] because when there is no input, y = 0,
+# when there is one input y = 1 etc 
+# Doesn't work with vectors though
+
+def linear_reg_method(X, X_test, Y_cat,Y_test_cat):
+    mlr = LinearRegression()  
+    mlr.fit(X, Y_cat)
+    print(mlr.coef_)
 
 
-### Trying with a neural network model
-# see page 4 of the original paper for the different parameters 
-# Here we want each category to be mutually incompatible so we add a layer with one neuron that has softmax activation function and 
+    print("Intercept: ", mlr.intercept_)
+    print("Coefficients:")
+    list(zip(X, mlr.coef_))
 
-model = keras.Sequential([keras.layers.Dense(32, activation='relu', input_shape=[4]),
-                          keras.layers.Dense(5, activation='softmax')])   #keras.layers.Dense(4, activation='relu', input_shape=[4], kernel_regularizer=regularizers.l2(0.0001)
+    y_pred_mlr= mlr.predict(X_test)
+    print("Prediction for test set: {}".format(y_pred_mlr))
+    print("Real values: {}".format(Y_test_cat))
 
-model.compile(loss='categorical_crossentropy', optimizer=keras.optimizers.Adam(0.1), metrics=['categorical_accuracy']) # 'categorical_crossentropy'
-model.fit(X,Ybis)
 
-model.evaluate(X_test,Y_test_bis)
-Y_test_pred = model.predict(X_test)
-# print(Y_test_pred)
-Y_pred = model.predict(X)
+    from sklearn import metrics
+    meanAbErr = metrics.mean_absolute_error(Y_test_cat, y_pred_mlr)
+    meanSqErr = metrics.mean_squared_error(Y_test_cat, y_pred_mlr)
+    rootMeanSqErr = np.sqrt(metrics.mean_squared_error(Y_test_cat, y_pred_mlr))
+    print('R squared: {:.2f}'.format(mlr.score(X,Y_cat)*100))
+    print('Mean Absolute Error:', meanAbErr)
+    print('Mean Square Error:', meanSqErr)
+    print('Root Mean Square Error:', rootMeanSqErr)
+
+# ### Neural network model
+# # see page 4 of the original paper for the different parameters 
+# # Here we want each category to be mutually incompatible so we add a layer with one neuron that has softmax activation function and 
+
+# model = keras.Sequential([keras.layers.Dense(32, activation='relu', input_shape=[4]),
+#                           keras.layers.Dense(5, activation='softmax')])   #keras.layers.Dense(4, activation='relu', input_shape=[4], kernel_regularizer=regularizers.l2(0.0001)
+
+# model.compile(loss='categorical_crossentropy', optimizer=keras.optimizers.Adam(0.1), metrics=['categorical_accuracy']) # 'categorical_crossentropy'
+# model.fit(X,Ybis)
+
+# model.evaluate(X_test,Y_test_bis)
+# Y_test_pred = model.predict(X_test)
+# # print(Y_test_pred)
+# Y_pred = model.predict(X)
+# # print(Y_pred)
+# Y_pred = np.argmax(Y_pred, axis=-1)
 # print(Y_pred)
-Y_pred = np.argmax(Y_pred, axis=-1)
-print(Y_pred)
 
-first_layer_weights = model.layers[0].get_weights()[0]
-print(first_layer_weights)
+# first_layer_weights = model.layers[0].get_weights()[0]
+# print(first_layer_weights)
+

@@ -154,7 +154,7 @@ program ANN() :={
 	 count:=count+dt,
 	 emit_signal(e,1),
 	 emit_signal(bac,get_signal(f)),
-	 set_signal(oxy,rand(400)-100,rand(500)-250, 0)
+	 set_signal(oxy,rand(400)-100,rand(500)-250, 0) //Controlling the amount of oxygen 
        }
        
   t > 0.25 : { t := 0, m1:=m2, m2:= get_signal(d)}
