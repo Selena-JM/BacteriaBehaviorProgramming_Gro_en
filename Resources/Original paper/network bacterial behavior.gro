@@ -298,8 +298,8 @@ program main() := {
 
   total = dt : {ecoli ([x:=-235, y:=5], program ANN())}
   
-  count >= 1 : {Y:= maptocells yfp/volume end, // Don't understand the "end" --> maybe to say its the end of the function call
-       	         movility := data Y ,
+  count >= 1 : {Y:= maptocells yfp/volume end, // "end" to say its the end of the function call
+       	         movility := data Y , // Y contains the value of yfp/volume of each cell, so risk3.num is the whole number of cells, risk3.mean is the mean of yellow across all cells etc
 		 B:= maptocells cfp/volume end,
        	         aerobic := data B ,
 		 R:= maptocells rfp/volume end,

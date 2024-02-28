@@ -7,7 +7,8 @@ include gro
 environment:={0,0,0,0};
 fp := fopen ( "output_response.csv", "w" );
 detection :=0.15;
-urea_range:={0.50,1.50};//To complete
+urea_range:={0.50,1.50} ; //To complete, in M {0.0083,0.025}
+color_level := 1000;
 
 // Environmental model simulating the presence of infection factors or not
 // 
@@ -17,7 +18,7 @@ urea_range:={0.50,1.50};//To complete
 qs := signal(4, 0.1);
 toxins := signal(4, 0.1);
 sider := signal(4, 0.1);
-urea := signal(0, 0.0); 
+urea := signal(0, 0); 
 
 
 //Selection function to compare to urea range
@@ -32,13 +33,8 @@ fun comparative g r .
 //behavior:= {0,0,0,0};
 behavior := 0;
 fun data L .
-  let n := length(L), mu := ( sumlist L ) / n in
-    [
-      num := n ,
-      mean := mu ,
-      std := sqrt ( sumlist ( map ( \ x . (x-mu)^2 ) L ) / n )
-    ]
-  end;
+  ( sumlist L ) / color_level;
+
 
 // Detection function 
 fun detect i .
@@ -79,12 +75,8 @@ program ANN() :={
   true:{t:= t+dt,
         rep:= rep+dt,
 	 	count:=count+dt,
-		set_signal(qs,rand(400)-100,rand(500)-250, 5),
-		set_signal(toxins,rand(500)-250,(rand(500)-250),5),
-		set_signal(sider,rand(500)-250,(rand(500)-250),5)
+		//set_signal(urea,rand(500)-250,(rand(500)-250),1)
        }
-       
-  // t > 0.25 : { t := 0, m1:=m2, m2:= get_signal(d)}
 
 // s.e[0]: bacterium detects AI-2;        s.e[1]: bacterium detects urea in dangerous scope;
 // s.e[2]: bacterium detects toxins;      s.e[3]: bacterium detects siderophores;
@@ -115,139 +107,167 @@ program ANN() :={
 								rfp:=0
                             	}
   s.e[0]=1 & s.e[1]=0 & s.e[2]=0 & s.e[3]=0 :{s.c:=1, 
-								gfp:=1000,
+								gfp:=color_level,
 								cfp:=0,
 								yfp:=0,
 								rfp:=0
                             	}
   s.e[0]=0 & s.e[1]=1 & s.e[2]=0 & s.e[3]=0 :{s.c:=1, 
-								gfp:=1000,
+								gfp:=color_level,
 								cfp:=0,
 								yfp:=0,
 								rfp:=0
                             	}
   s.e[0]=0 & s.e[1]=0 & s.e[2]=1 & s.e[3]=0 :{s.c:=1, 
-								gfp:=1000,
+								gfp:=color_level,
 								cfp:=0,
 								yfp:=0,
 								rfp:=0
                             	}
   s.e[0]=0 & s.e[1]=0 & s.e[2]=0 & s.e[3]=1 :{s.c:=1, 
-								gfp:=1000,
+								gfp:=color_level,
 								cfp:=0,
 								yfp:=0,
 								rfp:=0
                             	}
   s.e[0]=1 & s.e[1]=1 & s.e[2]=0 & s.e[3]=0 :{s.c:=1, 
 								gfp:=0,
-								cfp:=1000,
+								cfp:=color_level,
 								yfp:=0,
 								rfp:=0
                             	}
   
   s.e[0]=1 & s.e[1]=0 & s.e[2]=1 & s.e[3]=0 :{s.c:=1, 
 								gfp:=0,
-								cfp:=1000,
+								cfp:=color_level,
 								yfp:=0,
 								rfp:=0
                             	}
   s.e[0]=1 & s.e[1]=0 & s.e[2]=0 & s.e[3]=1 :{s.c:=1, 
 								gfp:=0,
-								cfp:=1000,
+								cfp:=color_level,
 								yfp:=0,
 								rfp:=0
                             	}
   s.e[0]=0 & s.e[1]=1 & s.e[2]=1 & s.e[3]=0 :{s.c:=1, 
 								gfp:=0,
-								cfp:=1000,
+								cfp:=color_level,
 								yfp:=0,
 								rfp:=0
                             	}
   s.e[0]=0 & s.e[1]=1 & s.e[2]=0 & s.e[3]=1 :{s.c:=1, 
 								gfp:=0,
-								cfp:=1000,
+								cfp:=color_level,
 								yfp:=0,
 								rfp:=0
                             	}
   s.e[0]=0 & s.e[1]=0 & s.e[2]=1 & s.e[3]=1 :{s.c:=1, 
 								gfp:=0,
-								cfp:=1000,
+								cfp:=color_level,
 								yfp:=0,
 								rfp:=0
                             	}
   s.e[0]=1 & s.e[1]=1 & s.e[2]=1 & s.e[3]=0 :{s.c:=1, 
 								gfp:=0,
 								cfp:=0,
-								yfp:=1000,
+								yfp:=color_level,
 								rfp:=0
                             	}
   s.e[0]=1 & s.e[1]=1 & s.e[2]=0 & s.e[3]=1 :{s.c:=1, 
 								gfp:=0,
 								cfp:=0,
-								yfp:=1000,
+								yfp:=color_level,
 								rfp:=0
                             	}
   s.e[0]=0 & s.e[1]=1 & s.e[2]=1 & s.e[3]=1 :{s.c:=1, 
 								gfp:=0,
 								cfp:=0,
-								yfp:=1000,
+								yfp:=color_level,
 								rfp:=0
                             	}
   s.e[0]=1 & s.e[1]=0 & s.e[2]=1 & s.e[3]=1 :{s.c:=1, 
 								gfp:=0,
 								cfp:=0,
-								yfp:=1000,
+								yfp:=color_level,
 								rfp:=0
                             	}
   s.e[0]=1 & s.e[1]=1 & s.e[2]=1 & s.e[3]=1 :{s.c:=1, 
 								gfp:=0,
 								cfp:=0,
 								yfp:=0,
-								rfp:=1000
+								rfp:=color_level
                             	}
 
 
-  selected  : {print(s.e," ",s.c," ",get_signal(urea))} //To complete
+  //selected  : {print(s.e," ",s.c," ",get_signal(urea))} //To complete
 
 // This will set a lot of signals coming from everywhere but juste one time at the beginning of the simulation
-  foreach i in range 1200 do {
-    set_signal(urea,rand(500)-250,(rand(500)-250),5), //set_signal(signal_name, location_x, location_y, concentration)
-	set_signal(toxins,rand(500)-250,(rand(500)-250),5),
-	set_signal(sider,rand(500)-250,(rand(500)-250),5),
-	set_signal(qs,rand(500)-250,(rand(500)-250),5)
+  foreach i in range 1400 do {
+    set_signal(urea,rand(500)-250,(rand(500)-250),1) //set_signal(signal_name, location_x, location_y, concentration)
+	//set_signal(toxins,rand(500)-250,(rand(500)-250),5),
+	//set_signal(sider,rand(500)-250,(rand(500)-250),5),
+	//set_signal(qs,rand(500)-250,(rand(500)-250),5)
   }end; // To complete and refine the numbers especially the concentrations
 };
 
 program main() := {
   count:=0;
   total:=0;
+  ntot:=0;
+  risk0:=0;
   Y:={};
-  risk3:= [ num := 0, mean := 0, std := 0 ];
+  risk3:= 0;
   B:={};
-  risk2:= [ num := 0, mean := 0, std := 0 ];
+  risk2:= 0;
   R:={};
-  risk4:= [ num := 0, mean := 0, std := 0 ];
+  risk4:= 0;
   G:={};
-  risk1:= [ num := 0, mean := 0, std := 0 ];
+  risk1:= 0;
  
   true : { count := count + dt,
        	   total := total + dt
 	 }
 
-  total = dt : {ecoli ([x:=-235, y:=5], program ANN())}
+  total = dt : {ecoli ([x:=0, y:=0], program ANN())}
   
-  count >= 1 : {Y:= maptocells yfp/volume end, // Don't understand the "end" --> maybe to say its the end of the function call
-       	         risk3 := data Y ,
-		 B:= maptocells cfp/volume end,
-       	         risk2 := data B ,
-		 R:= maptocells rfp/volume end,
-       	         risk4 := data R ,
-		 G:= maptocells gfp/volume end,
+  count >= 1 : {G:= maptocells gfp end,
        	         risk1 := data G ,
-			 print("cell count = ",risk3.num," mean risk3 = ",risk3.mean," mean risk2 = ",risk2.mean," mean risk4 = ",risk4.mean," mean risk1 = ",risk1.mean),
-	         fprint (fp,risk3.num,",",risk3.mean,",",risk2.mean,",",risk4.mean,",",risk1.mean,"\n" ),
+		 B:= maptocells cfp end,
+       	         risk2 := data B ,
+		 Y:= maptocells yfp end,
+       	         risk3 := data Y , 
+		 R:= maptocells rfp end,
+       	         risk4 := data R ,
+		 
+		 ntot := length(G),
+		 risk0 := ntot - risk1 - risk2 - risk3 - risk4,
+			 print("nbcells = ",ntot,", risk0 = ",risk0,", risk1 = ",risk1,", risk2 = ",risk2,", risk3 = ",risk3,", risk4 = ",risk4),
+	         fprint (fp,ntot,",",risk0,",",risk1,",",risk2,",",risk3,",",risk4,"\n" ),
 		 count:=0
 	       }
-  // total>=45.1 :{exit()}
+
+  total = 0 :{print("Current environment : Urea ")}
+
+  total >=50 & total < 50.02:{print("Current environment : Urea and AI-2 ")}
+
+  total>50 & total<120:{
+		set_signal(qs,rand(500)-250,rand(500)-250, 5) // in purple
+	}
+
+  total >= 75 & total < 75.02 :{print("Current environment : Urea, AI-2 and siderophores ")}
+
+  total>75 & total<120:{
+		set_signal(sider,rand(500)-250,(rand(500)-250),5) // in yellow
+	}
+  
+  total >= 100 & total < 100.02 :{print("Current environment : Urea, AI-2, siderophores and toxins ")}
+
+  total>100 & total<120:{
+		set_signal(toxins,rand(500)-250,(rand(500)-250),5) // in blue
+	}
+
+  total >= 120 & total < 120.02:{print("Current environment : Urea")}
+
+
 };
 

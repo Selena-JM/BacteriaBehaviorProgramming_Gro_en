@@ -19,9 +19,9 @@ include gro
 
 //Experimental set up
 
-molasses_range:={1.50,7.50};
-urea_range:={0.50,1.50};
-propionic_acid_range:={10.00,50.00};
+molasses_range:={1.50,7.50}; // %
+urea_range:={0.50,1.50}; // g/L
+propionic_acid_range:={10.00,50.00}; // mmol/L
 phb_range:={2.5,6.75};
 
 //Artificial neural network parameters
