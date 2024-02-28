@@ -1,5 +1,9 @@
 include gro
 
+chemostat ( true );
+set ( "chemostat_width", 500);
+set ( "chemostat_height", 500 );
+
 // Neural network parameters
 // To complete
 
@@ -202,7 +206,7 @@ program ANN() :={
   //selected  : {print(s.e," ",s.c," ",get_signal(urea))} //To complete
 
 // This will set a lot of signals coming from everywhere but juste one time at the beginning of the simulation
-  foreach i in range 1400 do {
+  foreach i in range 1200 do {
     set_signal(urea,rand(500)-250,(rand(500)-250),1) //set_signal(signal_name, location_x, location_y, concentration)
 	//set_signal(toxins,rand(500)-250,(rand(500)-250),5),
 	//set_signal(sider,rand(500)-250,(rand(500)-250),5),
