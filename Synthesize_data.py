@@ -245,3 +245,4 @@ We can save the synthesizer to share with others and sample more synthetic data 
 # synthesizer.save('my_synthesizer.pkl')
 
 # synthesizer = SingleTablePreset.load('my_synthesizer.pkl')
+ 
