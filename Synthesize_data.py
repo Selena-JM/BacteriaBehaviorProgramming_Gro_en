@@ -12,6 +12,7 @@ If we stop considering binary inputs we can use this script to synthetize data :
 import sdv
 from sdv.lite import SingleTablePreset
 import pandas as pd
+import numpy as np
 
 ### 1. Creating pre-existing data
 """
@@ -35,7 +36,7 @@ X_bin = [[0, 0, 0,	0],
     [0,	1,	1,	1],
     [1,	1,	1,	1]]
 
-X_float = [[0, 0, 0, 0],
+X_float_1 = [[0, 0, 0, 0],
     [1,	1,	1,	1],
     [0.45, 0, 0, 0],
     [0,	0.75,	0,	0],
@@ -58,9 +59,32 @@ X_float = [[0, 0, 0, 0],
     [0.25,	0.65,	0.10,	0.55],
     [0.60,	0.7,	0.95,	0.85]]
 
+# With this technique I don't need the data synthesis ? 
+rows = 40
+lim = int(np.floor(rows/5))
+X_float = np.zeros((rows,4))
+Y_float = np.zeros((rows,1))
+for i in range(lim) :
+    Y_float[i] = 0
+for i in range(lim, 2*lim) :
+    Y_float[i] = 1
+for i in range(2*lim, 3*lim) :
+    Y_float[i] = 2
+for i in range(3*lim, 4*lim) :
+    Y_float[i] = 3
+for i in range(4*lim, 5*lim) :
+    Y_float[i] = 4
 
+for i in range(rows) :
+    X_float[i][0] = abs(Y_float[i]/4 + (np.random.choice([-1,1]) * (np.random.random()-1)*10**(-1)))
+    X_float[i][1] = abs(Y_float[i]/4 + (np.random.choice([-1,1]) * (np.random.random()-1)*10**(-1)))
+    X_float[i][2] = abs(Y_float[i]/4 + (np.random.choice([-1,1]) * (np.random.random()-1)*10**(-1)))
+    X_float[i][3] = abs(Y_float[i]/4 + (np.random.choice([-1,1]) * (np.random.random()-1)*10**(-1)))
+
+
+Y_cat_float = Y_float
 Y_cat_bin = [0, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4]
-Y_cat_float = [0, 4, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 2, 3, 2, 4, 2, 3, 3, 2, 4]
+Y_cat_float_1 = [0, 4, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 2, 3, 2, 4, 2, 3, 3, 2, 4]
 
 real_data = pd.DataFrame(X_float, columns=["AI-2", "Urea", "Toxins", "Siderophores"])
 real_data.insert(4,"Risk", Y_cat_float)
@@ -102,7 +126,7 @@ metadata.columns = {
         },
         "Risk": {
             "sdtype": "numerical",
-            "computer_representation": "Float"
+            "computer_representation": "Int16"
         }
         }
 metadata.primary_key = "Id"

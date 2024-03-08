@@ -10,10 +10,12 @@ from sklearn import tree
 from sklearn.tree import _tree
 from sklearn.metrics import accuracy_score
 from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
 
 
 ### Data creation 
-X = [[0, 0, 0,	0],
+## Naive approach
+X_naive = [[0, 0, 0, 0],
     [1,	0,	0,	0],
     [0,	1,	0,	0],
     [0,	0,	1,	0],
@@ -30,16 +32,64 @@ X = [[0, 0, 0,	0],
     [0,	1,	1,	1],
     [1,	1,	1,	1]]
 
-Y_cat = [0, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4]
+# If we consider the activation of fluorescence 
+Y_naive = [[0,0,0,0], [1,0,0,0], [1,0,0,0], [1,0,0,0], [1,0,0,0], [0,1,0,0], [0,1,0,0], [0,1,0,0], [0,1,0,0], [0,1,0,0], [0,1,0,0], [0,0,1,0], [0,0,1,0], [0,0,1,0], [0,0,1,0], [0,0,0,1]]
 
-Y = [[0,0,0,0], [1,0,0,0], [1,0,0,0], [1,0,0,0], [1,0,0,0], [0,1,0,0], [0,1,0,0], [0,1,0,0], [0,1,0,0], [0,1,0,0], [0,1,0,0], [0,0,1,0], [0,0,1,0], [0,0,1,0], [0,0,1,0], [0,0,0,1]]
-Ybis = [[1,0,0,0,0], [0,1,0,0,0], [0,1,0,0,0], [0,1,0,0,0], [0,1,0,0,0], [0,0,1,0,0], [0,0,1,0,0], [0,0,1,0,0], [0,0,1,0,0], [0,0,1,0,0], [0,0,1,0,0], [0,0,0,1,0], [0,0,0,1,0], [0,0,0,1,0], [0,0,0,1,0], [0,0,0,0,1]]
+# If we consider a classification
+Y_naive_classif = [[1,0,0,0,0], [0,1,0,0,0], [0,1,0,0,0], [0,1,0,0,0], [0,1,0,0,0], [0,0,1,0,0], [0,0,1,0,0], [0,0,1,0,0], [0,0,1,0,0], [0,0,1,0,0], [0,0,1,0,0], [0,0,0,1,0], [0,0,0,1,0], [0,0,0,1,0], [0,0,0,1,0], [0,0,0,0,1]]
 
-X_test = [X[i] for i in [0,5,9,15]]
+# If we consider categories
+Y_naive_categories = [0, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4]
 
-Y_test = [Y[i] for i in [0,5,9,15]]
-Y_test_cat = [Y_cat[i] for i in [0,5,9,15]]
-Y_test_bis = [Ybis[i] for i in [0,5,9,15]]
+#Definition of the train and test sets
+X_naive_train, X_naive_test, Y_naive_classif_train, Y_naive_classif_test = train_test_split(X_naive, Y_naive_classif, test_size=0.33, random_state=42)
+
+## Approach based on linear regression : each variable is linearly created with respect to the risk, 
+## with a director coefficient of 4. This method is not viable because each variable can be used alone for the 
+## classification : if urea is greater than 0.85 for example it means it is a risk 4, which is false
+# With this technique I don't need the data synthesis ? 
+rows = 40
+lim = int(np.floor(rows/5))
+X_lin = np.zeros((rows,4))
+
+# If we consider categories
+Y_lin_categories = np.zeros((rows,1))
+for i in range(lim) :
+    Y_lin_categories[i] = 0
+for i in range(lim, 2*lim) :
+    Y_lin_categories[i] = 1
+for i in range(2*lim, 3*lim) :
+    Y_lin_categories[i] = 2
+for i in range(3*lim, 4*lim) :
+    Y_lin_categories[i] = 3
+for i in range(4*lim, 5*lim) :
+    Y_lin_categories[i] = 4
+
+for i in range(rows) :
+    X_lin[i][0] = abs(Y_lin_categories[i]/4 + (np.random.choice([-1,1]) * (np.random.random()-1)*10**(-1)))
+    X_lin[i][1] = abs(Y_lin_categories[i]/4 + (np.random.choice([-1,1]) * (np.random.random()-1)*10**(-1)))
+    X_lin[i][2] = abs(Y_lin_categories[i]/4 + (np.random.choice([-1,1]) * (np.random.random()-1)*10**(-1)))
+    X_lin[i][3] = abs(Y_lin_categories[i]/4 + (np.random.choice([-1,1]) * (np.random.random()-1)*10**(-1)))
+
+# If we consider a classification
+Y_lin_classif = np.zeros((np.size(Y_lin_categories),5))
+for i in range (np.size(Y_lin_categories)):
+    if Y_lin_categories[i] == 0:
+       Y_lin_classif[i] = [1,0,0,0,0]
+    if Y_lin_categories[i] == 1:
+        Y_lin_classif[i] = [0,1,0,0,0]
+    if Y_lin_categories[i] == 2:
+        Y_lin_classif[i] = [0,0,1,0,0]
+    if Y_lin_categories[i] == 3:
+        Y_lin_classif[i] = [0,0,0,1,0]
+    if Y_lin_categories[i] == 4:
+        Y_lin_classif[i] = [0,0,0,0,1]
+
+#Definition of the train and test sets
+X_lin_train, X_lin_test, Y_lin_classif_train, Y_lin_classif_test = train_test_split(X_lin, Y_lin_classif, test_size=0.33, random_state=42)
+X_lin_train_cat, X_lin_test_cat, Y_lin_categories_train, Y_lin_categories_test = train_test_split(X_lin, Y_lin_categories, test_size=0.33, random_state=42)
+
+## Approach based on data synthesis
 
 
 ### Decision tree 
@@ -98,27 +148,20 @@ def get_rules(tree, feature_names, class_names):
         
     return rules
 
-def decision_tree_method(X, Y, cat=True,show=False):
+def decision_tree_method(X_train, Y_train, X_test, Y_test, cat=True,show=False):
     clf = tree.DecisionTreeClassifier(random_state=0)
-    clf.fit(X, Y)
+    clf.fit(X_train, Y_train)
 
 
-    Y_pred_tree = clf.predict(X)
-    print("Accuracy:", accuracy_score(Y, Y_pred_tree))
+    Y_pred_tree = clf.predict(X_test)
+    print("Accuracy:", accuracy_score(Y_test, Y_pred_tree))
 
+    feature_names = ["AI-2","Urea","Toxins","Siderophores"]
     if not cat:
         class_names = ["0","1","2","3"]
     else : 
         class_names = ["0","1","2","3","4"]
 
-    if show:
-        feature_names = ["AI-2","Urea","Toxins","Siderophores"]
-        fig = plt.figure(figsize=(15,10))
-        _ = tree.plot_tree(clf, 
-                        feature_names=["AI-2","Urea","Toxins","Siderophores"],  
-                        class_names=class_names,
-                        filled=True)
-        plt.show()
 
     text_representation = tree.export_text(clf, feature_names=feature_names)
     print(text_representation)
@@ -126,9 +169,17 @@ def decision_tree_method(X, Y, cat=True,show=False):
     rules = get_rules(clf, feature_names, class_names)
     for r in rules:
         print(r)
+    
+    if show:
+        fig = plt.figure(figsize=(15,10))
+        _ = tree.plot_tree(clf, 
+                        feature_names=["AI-2","Urea","Toxins","Siderophores"],  
+                        class_names=class_names,
+                        filled=True)
+        plt.show()
 
 
-# decision_tree_method(X, Y_cat, cat=True, show=False)
+# decision_tree_method(X_lin_train_cat, Y_lin_categories_train, X_lin_test_cat, Y_lin_categories_test, cat=True, show=True)
 
 ### Linear equations 
 def linear_eq_solving_method(X, Y):
@@ -176,24 +227,26 @@ def linear_reg_method(X, X_test, Y_cat,Y_test_cat):
     print('Mean Square Error:', meanSqErr)
     print('Root Mean Square Error:', rootMeanSqErr)
 
-# ### Neural network model
-# # see page 4 of the original paper for the different parameters 
-# # Here we want each category to be mutually incompatible so we add a layer with one neuron that has softmax activation function and 
+### Neural network model
+# see page 4 of the original paper for the different parameters 
+# Here we want each category to be mutually incompatible so we add a layer with one neuron that has softmax activation function and 
+def neural_network_method(X_lin_train,Y_lin_classif_train):
+    model = keras.Sequential([keras.layers.Dense(32, activation='relu', input_shape=[4]),
+                            keras.layers.Dense(5, activation='softmax')])   #keras.layers.Dense(4, activation='relu', input_shape=[4], kernel_regularizer=regularizers.l2(0.0001)
 
-# model = keras.Sequential([keras.layers.Dense(32, activation='relu', input_shape=[4]),
-#                           keras.layers.Dense(5, activation='softmax')])   #keras.layers.Dense(4, activation='relu', input_shape=[4], kernel_regularizer=regularizers.l2(0.0001)
+    model.compile(loss='categorical_crossentropy', optimizer=keras.optimizers.Adam(0.1), metrics=['categorical_accuracy']) # 'categorical_crossentropy'
+    model.fit(X_lin_train,Y_lin_classif_train)
 
-# model.compile(loss='categorical_crossentropy', optimizer=keras.optimizers.Adam(0.1), metrics=['categorical_accuracy']) # 'categorical_crossentropy'
-# model.fit(X,Ybis)
+    model.evaluate(X_lin_test,Y_lin_classif_test)
+    Y_test_pred = model.predict(X_lin_test)
+    # print(Y_test_pred)
+    # Y_pred = model.predict(X)
+    # print(Y_pred)
+    Y_pred = np.argmax(Y_test_pred, axis=-1)
+    print(Y_pred)
 
-# model.evaluate(X_test,Y_test_bis)
-# Y_test_pred = model.predict(X_test)
-# # print(Y_test_pred)
-# Y_pred = model.predict(X)
-# # print(Y_pred)
-# Y_pred = np.argmax(Y_pred, axis=-1)
-# print(Y_pred)
+    first_layer_weights = model.layers[0].get_weights()[0]
+    print(first_layer_weights)
+# neural_network_method(X_lin_train,Y_lin_classif_train)
 
-# first_layer_weights = model.layers[0].get_weights()[0]
-# print(first_layer_weights)
 

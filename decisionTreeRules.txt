@@ -1,5 +1,6 @@
-This document explains the decision tree rules for risk classification by 2 methods
+This document explains the decision tree rules for risk classification with 2 visualisations, for 2 cases
 
+Naive case : 
 Method 1: 
 |--- Urea <= 0.50
 |   |--- AI-2 <= 0.50
@@ -67,3 +68,27 @@ if (Urea <= 0.5) and (AI-2 <= 0.5) and (Toxins > 0.5) and (Siderophores > 0.5) t
 if (Urea <= 0.5) and (AI-2 <= 0.5) and (Toxins > 0.5) and (Siderophores <= 0.5) then class: 1 (proba: 100.0%) | based on 1 samples
 if (Urea <= 0.5) and (AI-2 <= 0.5) and (Toxins <= 0.5) and (Siderophores > 0.5) then class: 1 (proba: 100.0%) | based on 1 samples
 if (Urea <= 0.5) and (AI-2 <= 0.5) and (Toxins <= 0.5) and (Siderophores <= 0.5) then class: 0 (proba: 100.0%) | based on 1 samples
+
+Linear case : 
+Method 1 : 
+Accuracy: 1.0
+|--- Urea <= 0.15
+|   |--- class: 0.0
+|--- Urea >  0.15
+|   |--- Urea <= 0.90
+|   |   |--- AI-2 <= 0.39
+|   |   |   |--- class: 1.0
+|   |   |--- AI-2 >  0.39
+|   |   |   |--- Toxins <= 0.63
+|   |   |   |   |--- class: 2.0
+|   |   |   |--- Toxins >  0.63
+|   |   |   |   |--- class: 3.0
+|   |--- Urea >  0.90
+|   |   |--- class: 4.0
+
+Method 2:
+if (Urea > 0.153) and (Urea > 0.896) then class: 4 (proba: 100.0%) | based on 6 samples
+if (Urea > 0.153) and (Urea <= 0.896) and (AI-2 > 0.393) and (Toxins <= 0.627) then class: 2 (proba: 100.0%) | based on 6 samples
+if (Urea <= 0.153) then class: 0 (proba: 100.0%) | based on 6 samples
+if (Urea > 0.153) and (Urea <= 0.896) and (AI-2 > 0.393) and (Toxins > 0.627) then class: 3 (proba: 100.0%) | based on 4 samples
+if (Urea > 0.153) and (Urea <= 0.896) and (AI-2 <= 0.393) then class: 1 (proba: 100.0%) | based on 4 samples
