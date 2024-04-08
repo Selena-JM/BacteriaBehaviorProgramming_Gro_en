@@ -24,7 +24,7 @@ end;
 // qs: AI-2 (quorum sensing); env_in = environment (QS for the programmed bacteria);
 // toxins: virulence factor; sider: catabolic enzyme
 
-env_in := signal(0, 0); //purple
+env_in := signal(4, 0.1); //purple
 qs := signal(4, 0.1); //blue
 sider := signal(4, 0.1); //yellow
 toxins := signal(4, 0.1); //red
@@ -52,9 +52,6 @@ fun detect i .
     then 1
     else 0
   end;
-
-// Truth tables
-
 
 // Biological responses 
 // To complete
@@ -118,10 +115,6 @@ program ANN() :={
   //daughter :  { fprint (fp, s.e,",",s.c,"\n" ) }
 
 // Bacterial behavior table
-//  if number_inputs = 4 
-//  	then table_4_inputs s
-//	else table_3_inputs s
-//  end;
   s.c=0 : {gfp:=0,
 		cfp:=0,
 		yfp:=0,
@@ -192,6 +185,9 @@ program main() := {
 	       }
 
   total = 0 :{print("Current environment : Favorable ")}
+  total<120:{
+		set_signal(env_in,rand(500)-250,rand(500)-250, 5) 
+	}
 
   total >=50 & total < 50.02:{print("Current environment : Favorable and AI-2 ")}
 
