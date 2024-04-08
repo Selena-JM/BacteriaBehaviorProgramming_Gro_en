@@ -11,7 +11,7 @@ set ( "chemostat_height", 500 );
 fp := fopen ( "output_response.csv", "w" );
 detection := 0.15;
 color_level := 1000;
-number_inputs := 3;
+number_inputs := 4;
 
 environment:={0,0,0,0};
 if number_inputs = 4 
@@ -122,6 +122,10 @@ program ANN() :={
 //  	then table_4_inputs s
 //	else table_3_inputs s
 //  end;
+  s.c=0 : {gfp:=0,
+		cfp:=0,
+		yfp:=0,
+		rfp:=0}
   s.c=1 : {gfp:=color_level,
 		cfp:=0,
 		yfp:=0,
@@ -182,9 +186,6 @@ program main() := {
 		 
 		 ntot := length(G),
 		 risk0 := ntot - risk1 - risk2 - risk3 - risk4,
-		 	 print(G),
-			 print(B),
-			 print(Y),
 			 print("nbcells = ",ntot,", risk0 = ",risk0,", risk1 = ",risk1,", risk2 = ",risk2,", risk3 = ",risk3,", risk4 = ",risk4),
 	         fprint (fp,ntot,",",risk0,",",risk1,",",risk2,",",risk3,",",risk4,"\n" ),
 		 count:=0
@@ -211,7 +212,6 @@ program main() := {
 	}
 
   total >= 120 & total < 120.02:{print("Current environment : Favorable")}
-
 
 };
 
