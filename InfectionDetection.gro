@@ -8,21 +8,27 @@ set ( "chemostat_height", 500 );
 // To complete
 
 // Gro parameters
-environment:={0,0,0,0};
 fp := fopen ( "output_response.csv", "w" );
-detection :=0.15;
-urea_range:={0.50,1.50} ; //To complete, in M {0.0083,0.025}
+detection := 0.15;
 color_level := 1000;
+number_inputs := 3;
+
+environment:={0,0,0,0};
+if number_inputs = 4 
+	then environment={0,0,0,0} 
+	else environment={0,0,0} 
+end;
 
 // Environmental model simulating the presence of infection factors or not
 // 
-// qs: AI-2 (quorum sensing); u: urea;
+// qs: AI-2 (quorum sensing); env_in = environment (QS for the programmed bacteria);
 // toxins: virulence factor; sider: catabolic enzyme
 
-qs := signal(4, 0.1);
-toxins := signal(4, 0.1);
-sider := signal(4, 0.1);
-urea := signal(0, 0); 
+env_in := signal(0, 0); //purple
+qs := signal(4, 0.1); //blue
+sider := signal(4, 0.1); //yellow
+toxins := signal(4, 0.1); //red
+
 
 
 //Selection function to compare to urea range
@@ -47,6 +53,8 @@ fun detect i .
     else 0
   end;
 
+// Truth tables
+
 
 // Biological responses 
 // To complete
@@ -57,7 +65,7 @@ fun detect i .
 // Risk 1 : gfp
 // Risk 2 : cfp
 // Risk 3 : yfP
-// Risk 4 : cfp 
+// Risk 4 : rfp 
 
 program ANN() :={
   s:=[e:=environment ,score:=0.0,c:=behavior];
@@ -79,19 +87,19 @@ program ANN() :={
   true:{t:= t+dt,
         rep:= rep+dt,
 	 	count:=count+dt,
-		//set_signal(urea,rand(500)-250,(rand(500)-250),1)
+		//set_signal(env_in,rand(500)-250,(rand(500)-250),1)
        }
 
-// s.e[0]: bacterium detects AI-2;        s.e[1]: bacterium detects urea in dangerous scope;
-// s.e[2]: bacterium detects toxins;      s.e[3]: bacterium detects siderophores;
+// s.e[0]: bacterium detects favorable environment;   s.e[1]: bacterium detects AI-2;
+// s.e[2]: bacterium detects siderophores;            s.e[3]: bacterium detects toxins;
 //
 // s.c[0]: no fluorescence;   s.c[1]: gfp;
 // s.c[2]: cfp;               s.c[3]: yfp;    s.c[4]: rfp;
 
-  rep >= 0.5 :{ s.e[0]:=detect(get_signal(qs)),
-                s.e[1]:=comparative (get_signal(urea)) urea_range,
-              	s.e[2]:=detect(get_signal(toxins)),
-              	s.e[3]:=detect(get_signal(sider)),
+  rep >= 0.5 & number_inputs=4 :{ s.e[0]:=detect(get_signal(env_in)),
+                s.e[1]:=detect(get_signal(qs)),
+				s.e[2]:=detect(get_signal(sider)),
+              	s.e[3]:=detect(get_signal(toxins)),
 	        	//s.c[0] :=relu((s.e[0]*w_1[0])+(s.e[1]*w_1[1])+(s.e[2]*w_1[2])+(s.e[3]*w_1[3])), // relu is natural here since if the sum is negative is corresponds to an absence of response, not a negative response
 	        	//s.c[1] :=relu((s.e[0]*w_2[0])+(s.e[1]*w_2[1])+(s.e[2]*w_2[2])+(s.e[3]*w_2[3])),
 	        	//s.c[2] :=relu((s.e[0]*w_3[0])+(s.e[1]*w_3[1])+(s.e[2]*w_3[2])+(s.e[3]*w_3[3])),
@@ -99,115 +107,44 @@ program ANN() :={
 				s.c := s.e[0]+s.e[1]+s.e[2]+s.e[3],
 	        	rep := 0
                }
+  rep >= 0.5 & number_inputs=3 :{ s.e[0]:=detect(get_signal(env_in)),
+                s.e[1]:=detect(get_signal(qs)),
+				s.e[2]:=detect(get_signal(sider)),
+				s.c := s.e[0]+s.e[1]+s.e[2],
+	        	rep := 0
+               }
+  
 
   //daughter :  { fprint (fp, s.e,",",s.c,"\n" ) }
 
 // Bacterial behavior table
-//
-  s.e[0]=0 & s.e[1]=0 & s.e[2]=0 & s.e[3]=0 :{s.c:=1, 
-								gfp:=0,
-								cfp:=0,
-								yfp:=0,
-								rfp:=0
-                            	}
-  s.e[0]=1 & s.e[1]=0 & s.e[2]=0 & s.e[3]=0 :{s.c:=1, 
-								gfp:=color_level,
-								cfp:=0,
-								yfp:=0,
-								rfp:=0
-                            	}
-  s.e[0]=0 & s.e[1]=1 & s.e[2]=0 & s.e[3]=0 :{s.c:=1, 
-								gfp:=color_level,
-								cfp:=0,
-								yfp:=0,
-								rfp:=0
-                            	}
-  s.e[0]=0 & s.e[1]=0 & s.e[2]=1 & s.e[3]=0 :{s.c:=1, 
-								gfp:=color_level,
-								cfp:=0,
-								yfp:=0,
-								rfp:=0
-                            	}
-  s.e[0]=0 & s.e[1]=0 & s.e[2]=0 & s.e[3]=1 :{s.c:=1, 
-								gfp:=color_level,
-								cfp:=0,
-								yfp:=0,
-								rfp:=0
-                            	}
-  s.e[0]=1 & s.e[1]=1 & s.e[2]=0 & s.e[3]=0 :{s.c:=1, 
-								gfp:=0,
-								cfp:=color_level,
-								yfp:=0,
-								rfp:=0
-                            	}
-  
-  s.e[0]=1 & s.e[1]=0 & s.e[2]=1 & s.e[3]=0 :{s.c:=1, 
-								gfp:=0,
-								cfp:=color_level,
-								yfp:=0,
-								rfp:=0
-                            	}
-  s.e[0]=1 & s.e[1]=0 & s.e[2]=0 & s.e[3]=1 :{s.c:=1, 
-								gfp:=0,
-								cfp:=color_level,
-								yfp:=0,
-								rfp:=0
-                            	}
-  s.e[0]=0 & s.e[1]=1 & s.e[2]=1 & s.e[3]=0 :{s.c:=1, 
-								gfp:=0,
-								cfp:=color_level,
-								yfp:=0,
-								rfp:=0
-                            	}
-  s.e[0]=0 & s.e[1]=1 & s.e[2]=0 & s.e[3]=1 :{s.c:=1, 
-								gfp:=0,
-								cfp:=color_level,
-								yfp:=0,
-								rfp:=0
-                            	}
-  s.e[0]=0 & s.e[1]=0 & s.e[2]=1 & s.e[3]=1 :{s.c:=1, 
-								gfp:=0,
-								cfp:=color_level,
-								yfp:=0,
-								rfp:=0
-                            	}
-  s.e[0]=1 & s.e[1]=1 & s.e[2]=1 & s.e[3]=0 :{s.c:=1, 
-								gfp:=0,
-								cfp:=0,
-								yfp:=color_level,
-								rfp:=0
-                            	}
-  s.e[0]=1 & s.e[1]=1 & s.e[2]=0 & s.e[3]=1 :{s.c:=1, 
-								gfp:=0,
-								cfp:=0,
-								yfp:=color_level,
-								rfp:=0
-                            	}
-  s.e[0]=0 & s.e[1]=1 & s.e[2]=1 & s.e[3]=1 :{s.c:=1, 
-								gfp:=0,
-								cfp:=0,
-								yfp:=color_level,
-								rfp:=0
-                            	}
-  s.e[0]=1 & s.e[1]=0 & s.e[2]=1 & s.e[3]=1 :{s.c:=1, 
-								gfp:=0,
-								cfp:=0,
-								yfp:=color_level,
-								rfp:=0
-                            	}
-  s.e[0]=1 & s.e[1]=1 & s.e[2]=1 & s.e[3]=1 :{s.c:=1, 
-								gfp:=0,
-								cfp:=0,
-								yfp:=0,
-								rfp:=color_level
-                            	}
+//  if number_inputs = 4 
+//  	then table_4_inputs s
+//	else table_3_inputs s
+//  end;
+  s.c=1 : {gfp:=color_level,
+		cfp:=0,
+		yfp:=0,
+		rfp:=0}
+  s.c=2 : {gfp:=0,
+		cfp:=color_level,
+		yfp:=0,
+		rfp:=0}
+  s.c=3 : {gfp:=0,
+		cfp:=0,
+		yfp:=color_level,
+		rfp:=0}
+  s.c=4 : {gfp:=0,
+		cfp:=0,
+		yfp:=0,
+		rfp:=color_level}
 
 
-  //selected  : {print(s.e," ",s.c," ",get_signal(urea))} //To complete
+  //selected  : {print(s.e," ",s.c," ",get_signal(env_in))} //To complete
 
 // This will set a lot of signals coming from everywhere but juste one time at the beginning of the simulation
   foreach i in range 1200 do {
-    set_signal(urea,rand(500)-250,(rand(500)-250),1) //set_signal(signal_name, location_x, location_y, concentration)
+    set_signal(env_in,rand(500)-250,(rand(500)-250),1) //set_signal(signal_name, location_x, location_y, concentration)
 	//set_signal(toxins,rand(500)-250,(rand(500)-250),5),
 	//set_signal(sider,rand(500)-250,(rand(500)-250),5),
 	//set_signal(qs,rand(500)-250,(rand(500)-250),5)
@@ -245,32 +182,35 @@ program main() := {
 		 
 		 ntot := length(G),
 		 risk0 := ntot - risk1 - risk2 - risk3 - risk4,
+		 	 print(G),
+			 print(B),
+			 print(Y),
 			 print("nbcells = ",ntot,", risk0 = ",risk0,", risk1 = ",risk1,", risk2 = ",risk2,", risk3 = ",risk3,", risk4 = ",risk4),
 	         fprint (fp,ntot,",",risk0,",",risk1,",",risk2,",",risk3,",",risk4,"\n" ),
 		 count:=0
 	       }
 
-  total = 0 :{print("Current environment : Urea ")}
+  total = 0 :{print("Current environment : Favorable ")}
 
-  total >=50 & total < 50.02:{print("Current environment : Urea and AI-2 ")}
+  total >=50 & total < 50.02:{print("Current environment : Favorable and AI-2 ")}
 
   total>50 & total<120:{
-		set_signal(qs,rand(500)-250,rand(500)-250, 5) // in purple
+		set_signal(qs,rand(500)-250,rand(500)-250, 5) 
 	}
 
-  total >= 75 & total < 75.02 :{print("Current environment : Urea, AI-2 and siderophores ")}
+  total >= 75 & total < 75.02 :{print("Current environment : Favorable, AI-2 and siderophores ")}
 
   total>75 & total<120:{
-		set_signal(sider,rand(500)-250,(rand(500)-250),5) // in yellow
+		set_signal(sider,rand(500)-250,(rand(500)-250),5) 
 	}
   
-  total >= 100 & total < 100.02 :{print("Current environment : Urea, AI-2, siderophores and toxins ")}
+  number_inputs=4 & total >= 100 & total < 100.02 :{print("Current environment : Favorable, AI-2, siderophores and toxins ")}
 
-  total>100 & total<120:{
-		set_signal(toxins,rand(500)-250,(rand(500)-250),5) // in blue
+  number_inputs=4 & total>100 & total<120:{
+		set_signal(toxins,rand(500)-250,(rand(500)-250),5) 
 	}
 
-  total >= 120 & total < 120.02:{print("Current environment : Urea")}
+  total >= 120 & total < 120.02:{print("Current environment : Favorable")}
 
 
 };

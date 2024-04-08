@@ -39,3 +39,152 @@ Functions are not the same as programs
             t >= x : { t := 0      }
 
         };
+
+fun table_4_inputs s color_level .
+  s.e[0]=0 & s.e[1]=0 & s.e[2]=0 & s.e[3]=0 :{c:=1, 
+								gfp:=0,
+								cfp:=0,
+								yfp:=0,
+								rfp:=0
+                            	}
+  	s.e[0]=1 & s.e[1]=0 & s.e[2]=0 & s.e[3]=0 :{s.c:=1, 
+								gfp:=color_level,
+								cfp:=0,
+								yfp:=0,
+								rfp:=0
+                            	}
+  	s.e[0]=0 & s.e[1]=1 & s.e[2]=0 & s.e[3]=0 :{s.c:=1, 
+								gfp:=color_level,
+								cfp:=0,
+								yfp:=0,
+								rfp:=0
+                            	}
+	s.e[0]=0 & s.e[1]=0 & s.e[2]=1 & s.e[3]=0 :{s.c:=1, 
+								gfp:=color_level,
+								cfp:=0,
+								yfp:=0,
+								rfp:=0
+								}
+	s.e[0]=0 & s.e[1]=0 & s.e[2]=0 :{s.c:=1, 
+								gfp:=color_level,
+								cfp:=0,
+								yfp:=0,
+								rfp:=0
+								}
+	s.e[0]=1 & s.e[1]=1 & s.e[2]=0 & s.e[3]=0 :{s.c:=1, 
+								gfp:=0,
+								cfp:=color_level,
+								yfp:=0,
+								rfp:=0
+								}
+	s.e[0]=1 & s.e[1]=0 & s.e[2]=1 & s.e[3]=0 :{s.c:=1, 
+								gfp:=0,
+								cfp:=color_level,
+								yfp:=0,
+								rfp:=0
+								}
+	s.e[0]=1 & s.e[1]=0 & s.e[2]=0 & s.e[3]=1 :{s.c:=1, 
+								gfp:=0,
+								cfp:=color_level,
+								yfp:=0,
+								rfp:=0
+								}
+	s.e[0]=0 & s.e[1]=1 & s.e[2]=1 & s.e[3]=0 :{s.c:=1, 
+								gfp:=0,
+								cfp:=color_level,
+								yfp:=0,
+								rfp:=0
+								}
+	s.e[0]=0 & s.e[1]=1 & s.e[2]=0 & s.e[3]=1 :{s.c:=1, 
+								gfp:=0,
+								cfp:=color_level,
+								yfp:=0,
+								rfp:=0
+								}
+	s.e[0]=0 & s.e[1]=0 & s.e[2]=1 & s.e[3]=1 :{s.c:=1, 
+								gfp:=0,
+								cfp:=color_level,
+								yfp:=0,
+								rfp:=0
+								}
+	s.e[0]=1 & s.e[1]=1 & s.e[2]=1 & s.e[3]=0 :{s.c:=1, 
+								gfp:=0,
+								cfp:=0,
+								yfp:=color_level,
+								rfp:=0
+								}
+	s.e[0]=1 & s.e[1]=1 & s.e[2]=0 & s.e[3]=1 :{s.c:=1, 
+								gfp:=0,
+								cfp:=0,
+								yfp:=color_level,
+								rfp:=0
+								}
+	s.e[0]=0 & s.e[1]=1 & s.e[2]=1 & s.e[3]=1 :{s.c:=1, 
+								gfp:=0,
+								cfp:=0,
+								yfp:=color_level,
+								rfp:=0
+								}
+	s.e[0]=1 & s.e[1]=0 & s.e[2]=1 & s.e[3]=1 :{s.c:=1, 
+								gfp:=0,
+								cfp:=0,
+								yfp:=color_level,
+								rfp:=0
+								}
+	s.e[0]=1 & s.e[1]=1 & s.e[2]=1 & s.e[3]=1 :{s.c:=1, 
+								gfp:=0,
+								cfp:=0,
+								yfp:=0,
+								rfp:=color_level
+								}
+
+
+fun table_3_inputs s .
+	s.e[0]=0 & s.e[1]=0 & s.e[2]=0 :{s.c:=1, 
+								gfp:=0,
+								cfp:=0,
+								yfp:=0,
+								rfp:=0
+                            	}
+  	s.e[0]=1 & s.e[1]=0 & s.e[2]=0 :{s.c:=1, 
+								gfp:=color_level,
+								cfp:=0,
+								yfp:=0,
+								rfp:=0
+                            	}
+  	s.e[0]=0 & s.e[1]=1 & s.e[2]=0 :{s.c:=1, 
+								gfp:=color_level,
+								cfp:=0,
+								yfp:=0,
+								rfp:=0
+                            	}
+	s.e[0]=0 & s.e[1]=0 & s.e[2]=1 :{s.c:=1, 
+								gfp:=color_level,
+								cfp:=0,
+								yfp:=0,
+								rfp:=0
+								}
+	s.e[0]=1 & s.e[1]=1 & s.e[2]=0 :{s.c:=1, 
+								gfp:=0,
+								cfp:=color_level,
+								yfp:=0,
+								rfp:=0
+								}
+	s.e[0]=1 & s.e[1]=0 & s.e[2]=1 :{s.c:=1, 
+								gfp:=0,
+								cfp:=color_level,
+								yfp:=0,
+								rfp:=0
+								}
+	s.e[0]=0 & s.e[1]=1 & s.e[2]=1 :{s.c:=1, 
+								gfp:=0,
+								cfp:=color_level,
+								yfp:=0,
+								rfp:=0
+								}
+	s.e[0]=1 & s.e[1]=1 & s.e[2]=1 :{s.c:=1, 
+								gfp:=0,
+								cfp:=0,
+								yfp:=color_level,
+								rfp:=0
+								}

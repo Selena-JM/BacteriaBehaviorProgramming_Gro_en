@@ -178,7 +178,6 @@ def decision_tree_method(X_train, Y_train, X_test, Y_test, cat=True,show=False):
                         filled=True)
         plt.show()
 
-
 # decision_tree_method(X_lin_train_cat, Y_lin_categories_train, X_lin_test_cat, Y_lin_categories_test, cat=True, show=True)
 
 ### Linear equations 
