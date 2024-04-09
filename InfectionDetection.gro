@@ -19,6 +19,8 @@ if number_inputs = 4
 	else environment={0,0,0} 
 end;
 
+
+
 // Environmental model simulating the presence of infection factors or not
 // 
 // qs: AI-2 (quorum sensing); env_in = environment (QS for the programmed bacteria);
@@ -54,7 +56,12 @@ fun detect i .
   end;
 
 // Biological responses 
-// To complete
+
+fun favorable fav_env .
+  if fav_env=1
+    then {emit_signal(env_in, 100), set("ecoli_growth_rate", 0.05)}
+    else {emit_signal(env_in, 10), set("ecoli_growth_rate", 0.03)}
+  end;
 
 
 //Artificial neural network program
@@ -83,8 +90,8 @@ program ANN() :={
 // This is evaluated at each update of each cell
   true:{t:= t+dt,
         rep:= rep+dt,
-	 	count:=count+dt,
-		//set_signal(env_in,rand(500)-250,(rand(500)-250),1)
+        count:=count+dt,
+        //set_signal(env_in,rand(500)-250,(rand(500)-250),1)
        }
 
 // s.e[0]: bacterium detects favorable environment;   s.e[1]: bacterium detects AI-2;
@@ -94,21 +101,21 @@ program ANN() :={
 // s.c[2]: cfp;               s.c[3]: yfp;    s.c[4]: rfp;
 
   rep >= 0.5 & number_inputs=4 :{ s.e[0]:=detect(get_signal(env_in)),
-                s.e[1]:=detect(get_signal(qs)),
-				s.e[2]:=detect(get_signal(sider)),
-              	s.e[3]:=detect(get_signal(toxins)),
-	        	//s.c[0] :=relu((s.e[0]*w_1[0])+(s.e[1]*w_1[1])+(s.e[2]*w_1[2])+(s.e[3]*w_1[3])), // relu is natural here since if the sum is negative is corresponds to an absence of response, not a negative response
-	        	//s.c[1] :=relu((s.e[0]*w_2[0])+(s.e[1]*w_2[1])+(s.e[2]*w_2[2])+(s.e[3]*w_2[3])),
-	        	//s.c[2] :=relu((s.e[0]*w_3[0])+(s.e[1]*w_3[1])+(s.e[2]*w_3[2])+(s.e[3]*w_3[3])),
-	        	//s.c[3] :=relu((s.e[0]*w_4[0])+(s.e[1]*w_4[1])+(s.e[2]*w_4[2])+(s.e[3]*w_4[3])),
-				s.c := s.e[0]+s.e[1]+s.e[2]+s.e[3],
-	        	rep := 0
+                  s.e[1]:=detect(get_signal(qs)),
+                  s.e[2]:=detect(get_signal(sider)),
+                  s.e[3]:=detect(get_signal(toxins)),
+                  //s.c[0] :=relu((s.e[0]*w_1[0])+(s.e[1]*w_1[1])+(s.e[2]*w_1[2])+(s.e[3]*w_1[3])), // relu is natural here since if the sum is negative is corresponds to an absence of response, not a negative response
+                  //s.c[1] :=relu((s.e[0]*w_2[0])+(s.e[1]*w_2[1])+(s.e[2]*w_2[2])+(s.e[3]*w_2[3])),
+                  //s.c[2] :=relu((s.e[0]*w_3[0])+(s.e[1]*w_3[1])+(s.e[2]*w_3[2])+(s.e[3]*w_3[3])),
+                  //s.c[3] :=relu((s.e[0]*w_4[0])+(s.e[1]*w_4[1])+(s.e[2]*w_4[2])+(s.e[3]*w_4[3])),
+                  s.c := s.e[0]+s.e[1]+s.e[2]+s.e[3],
+                  rep := 0
                }
   rep >= 0.5 & number_inputs=3 :{ s.e[0]:=detect(get_signal(env_in)),
-                s.e[1]:=detect(get_signal(qs)),
-				s.e[2]:=detect(get_signal(sider)),
-				s.c := s.e[0]+s.e[1]+s.e[2],
-	        	rep := 0
+                  s.e[1]:=detect(get_signal(qs)),
+                  s.e[2]:=detect(get_signal(sider)),
+                  s.c := s.e[0]+s.e[1]+s.e[2],
+                  rep := 0
                }
   
 
@@ -135,13 +142,16 @@ program ANN() :={
 		cfp:=0,
 		yfp:=0,
 		rfp:=color_level}
+  
+  // Emitting qs signal for the programmed bacteria
+  //emit_signal(env_in, 100);
 
 
   //selected  : {print(s.e," ",s.c," ",get_signal(env_in))} //To complete
 
 // This will set a lot of signals coming from everywhere but juste one time at the beginning of the simulation
   foreach i in range 1200 do {
-    set_signal(env_in,rand(500)-250,(rand(500)-250),1) //set_signal(signal_name, location_x, location_y, concentration)
+  //  set_signal(env_in,rand(500)-250,(rand(500)-250),1) //set_signal(signal_name, location_x, location_y, concentration)
 	//set_signal(toxins,rand(500)-250,(rand(500)-250),5),
 	//set_signal(sider,rand(500)-250,(rand(500)-250),5),
 	//set_signal(qs,rand(500)-250,(rand(500)-250),5)
@@ -184,30 +194,43 @@ program main() := {
 		 count:=0
 	       }
 
-  total = 0 :{print("Current environment : Favorable ")}
-  total<120:{
-		set_signal(env_in,rand(500)-250,rand(500)-250, 5) 
+  total = 0 :{print("Current environment : Not Favorable ")}
+  
+  total<100:{
+		//set_signal(env_in,rand(500)-250,rand(500)-250, 5) 
+    favorable 0
+	}
+  
+  total >=100 & total < 100.02 :{print("Current environment : Favorable ")}
+
+  total>100 & total<200:{
+		//set_signal(env_in,rand(500)-250,rand(500)-250, 5) 
+    favorable 1
 	}
 
-  total >=50 & total < 50.02:{print("Current environment : Favorable and AI-2 ")}
+  total >= 125 & total < 125.02:{print("Current environment : Favorable and AI-2 ")}
 
-  total>50 & total<120:{
+  total>125 & total<200:{
 		set_signal(qs,rand(500)-250,rand(500)-250, 5) 
 	}
 
-  total >= 75 & total < 75.02 :{print("Current environment : Favorable, AI-2 and siderophores ")}
+  total >= 150 & total < 150.02 :{print("Current environment : Favorable, AI-2 and siderophores ")}
 
-  total>75 & total<120:{
+  total>150 & total<200:{
 		set_signal(sider,rand(500)-250,(rand(500)-250),5) 
 	}
   
-  number_inputs=4 & total >= 100 & total < 100.02 :{print("Current environment : Favorable, AI-2, siderophores and toxins ")}
+  number_inputs=4 & total >= 175 & total < 175.02 :{print("Current environment : Favorable, AI-2, siderophores and toxins ")}
 
-  number_inputs=4 & total>100 & total<120:{
+  number_inputs=4 & total>175 & total<200:{
 		set_signal(toxins,rand(500)-250,(rand(500)-250),5) 
 	}
 
-  total >= 120 & total < 120.02:{print("Current environment : Favorable")}
+  total >= 200 & total < 200.02:{print("Current environment : Not Favorable")}
+
+  total>200:{
+		favorable 0
+	}
 
 };
 
