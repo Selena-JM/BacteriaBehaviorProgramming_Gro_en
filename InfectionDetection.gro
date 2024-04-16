@@ -26,7 +26,7 @@ end;
 // qs: AI-2 (quorum sensing); env_in = environment (QS for the programmed bacteria);
 // toxins: virulence factor; sider: catabolic enzyme
 
-env_in := signal(4, 0.1); //purple
+env_in := signal(4, 0.1); //purple s_signal([kdiff := 4, kdeg := 0.1])
 qs := signal(4, 0.1); //blue
 sider := signal(4, 0.1); //yellow
 toxins := signal(4, 0.1); //red
@@ -59,8 +59,8 @@ fun detect i .
 
 fun favorable fav_env .
   if fav_env=1
-    then {emit_signal(env_in, 100), set("ecoli_growth_rate", 0.05)}
-    else {emit_signal(env_in, 10), set("ecoli_growth_rate", 0.03)}
+    then {emit_signal(env_in, 100), set("ecoli_growth_rate", 0.04)} 
+    else {emit_signal(env_in, 100), set("ecoli_growth_rate", 0.01)} //emit_signal(env_in, 10), no need to differentiate the concentration, it is juste the increase in population that increases the QS and so passes the threshold
   end;
 
 
@@ -176,7 +176,10 @@ program main() := {
        	   total := total + dt
 	 }
 
-  total = dt : {ecoli ([x:=0, y:=0], program ANN())}
+  total = dt : {ecoli ([x:=-100, y:=-100], program ANN()),
+                ecoli ([x:=-100, y:=100], program ANN()),
+                ecoli ([x:=100, y:=-100], program ANN()),
+                ecoli ([x:=100, y:=100], program ANN())}
   
   count >= 1 : {G:= maptocells gfp end,
        	         risk1 := data G ,
