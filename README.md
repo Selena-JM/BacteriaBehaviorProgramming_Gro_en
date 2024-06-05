@@ -23,6 +23,42 @@ The model gives as output a risk factor. As a first approach, this risk factor i
 - 3 risk factors detected : Risk = 3, yellow fluorescence
 - 4 risk factors detected : Risk = 4, red fluorescence
 
-## The files 
+The idea of the project was to try to program the bacteria with neural networks as was mentionned in the original paper. In the latter, they did not really use neural networks, they used a truth table to associate the input detection to a specific output. We wanted to see if it was possible to train a neural network to associate the presence of certain inputs to a certain risk. But that was not possible due to : 
+- Lack of data : we have no data that associates those specific types of inputs to an infection risk. I tried to see if it was possible to synthesize data but that was not possible because of the second issue
+- We cannot work with non binary inputs : trying to influence the way the bacteria reacts to the sensing of something is a huge work in itself. Bacteria mostly sense things binarily : the detection of an input triggers different reactions, and we cannot engineer the thresholds, we have to work with how th bacteria works, so we had to work with binary inputs. So there were only 16 different input combinations, which means we don't have to use any kind of machine learning, we juste have to create a truth table ourselves, like in the original paper. 
+
+Nevertheless, I kept in this repository the different scripts I had written for data synthesis and machine learning so that they may be used for different purposes.
+
+## The files
+### Old_InfectionDetection.gro
+First simulations I did. I changed the scripts given in the original paper to fit our project. In this script there are 4 different inputs : AI-2, Urea, Siderophores, Toxins. And the risk in output is the number of risk factor detected. 
+
+This script executes a predefined simulation during which the risk factors increase each at a time so that we can see the bacteria going from no fluorescence, to green, to blue, to yellow, then to red and then all the risk factors disapear to show that the bacteria go back to no fluorescence when they detect nothing.
+
 ### InfectionDetection.gro
-Latest gro script to simulate the infection detection.
+Latest gro script, where the inputs are AI-2, QS, Siderophores, Toxins. One can choose whether to include toxins as an input with the parameter 'number_inputs' : if set to 4 then all the inputs are kepts, if set to 3 then the toxins are not considered as an input since they are not possible to include in a lab experiment. Only 3 and 4 are accepted values for 'number_inputs'. 
+
+The risk in output is the number of risk factor detected, as in the previous script Old_InfectionDetection.gro. In this script, the input-output association is more effecient since there is no need to write the whole truth table : the sum of detected inputs is computed and the adequate fluorescence is shown.
+
+As in Old_InfectionDetection.gro, there is a specific script that is executed to show all the different possibilities of fluorescence.
+
+### NeuralNetwork.py
+The script shows all the different methods of machine learning we could have used :
+- Solving linear equations
+- Linear regression
+- Decision trees
+- Neural Network -> this was not finished because it did not make sense to continue working on this but I included it because it is what had been done in the original paper
+
+All the methods listed above are either used with categories (the ouptput is juste a number in [0;4] to signify the risk category), or classifications (the ouput is a 1x5 vector, with [1,0,0,0,0] being the risk O, [0,1,0,0,0] being risk 1 etc
+
+In the first part "linear regression" I also tried to synthesize data using a linear regression : each variable is linearly created with respect to the risk, with a director coefficient of 4. This method is not viable because each variable can be used alone for the classification : if urea is greater than 0.85 for example it means it is a risk 4, which is false 
+
+### Synthesize_data.py
+I wrote this script using [The Synthetic Data Vault script](https://colab.research.google.com/drive/1F3WWduNjcX4oKck6XkjlwZ9zIsWlTGEM) for in case we could stop considering binary inputs. We could have used this script to synthetize data : 
+    - Create some real data with the real concentrations and we assign an infection risk
+    - Use this adapted and functionnal script to synthetize more data
+    - Train a more complicated NN than a single layer perceptron
+
+### decisionTreeRules.txt
+This document explains the decision tree rules for risk classification with 2 visualisations, for 2 cases. Those are the results of the decision tree method in 2 cases : the naive case (output is the number of risk factors detected), and the linear case (the data is created linearly to the risk factor).
+
