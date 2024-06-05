@@ -20,6 +20,7 @@ The model gives as output a risk factor. As a first approach, this risk factor i
 - 2 risk factors detected : Risk = 2, blue fluorescence
 - 3 risk factors detected : Risk = 3, yellow fluorescence
 - 4 risk factors detected : Risk = 4, red fluorescence
+<img width="687" alt="Inputs-outputs" src="https://github.com/Selena-JM/BacteriaBehaviorProgramming_Gro_en/assets/160735287/294d0f9f-e06d-42e7-b39d-68803bccb1bc">
 
 ## The files 
 ### InfectionDetection.gro
