@@ -49,15 +49,15 @@ The script shows all the different methods of machine learning we could have use
 - Decision trees
 - Neural Network -> this was not finished because it did not make sense to continue working on this but I included it because it is what had been done in the original paper
 
-All the methods listed above are either used with categories (the ouptput is juste a number in [0;4] to signify the risk category), or classifications (the ouput is a 1x5 vector, with [1,0,0,0,0] being the risk O, [0,1,0,0,0] being risk 1 etc
+All the methods listed above are either used with categories (the ouptput is juste a number in [0;4] to signify the risk category), or classifications (the ouput is a 1x5 vector, with [1,0,0,0,0] being the risk 0, [0,1,0,0,0] being risk 1 etc
 
 In the first part "linear regression" I also tried to synthesize data using a linear regression : each variable is linearly created with respect to the risk, with a director coefficient of 4. This method is not viable because each variable can be used alone for the classification : if urea is greater than 0.85 for example it means it is a risk 4, which is false 
 
 ### Synthesize_data.py
 I wrote this script using [The Synthetic Data Vault script](https://colab.research.google.com/drive/1F3WWduNjcX4oKck6XkjlwZ9zIsWlTGEM) for in case we could stop considering binary inputs. We could have used this script to synthetize data : 
-    - Create some real data with the real concentrations and we assign an infection risk
-    - Use this adapted and functionnal script to synthetize more data
-    - Train a more complicated NN than a single layer perceptron
+- Create some real data with the real concentrations and we assign an infection risk
+- Use this adapted and functionnal script to synthetize more data
+- Train a more complicated NN than a single layer perceptron
 
 ### decisionTreeRules.txt
 This document explains the decision tree rules for risk classification with 2 visualisations, for 2 cases. Those are the results of the decision tree method in 2 cases : the naive case (output is the number of risk factors detected), and the linear case (the data is created linearly to the risk factor).
