@@ -7,6 +7,8 @@ The goal was to study the possibility of detecting a urinary tract infection (UT
 This repository contains the simulation part of this project. The simulations were done using the software Gro, like in the original paper. 
 
 ## The simulation parameters
+<img width="687" alt="Inputs-outputs" src="https://github.com/Selena-JM/BacteriaBehaviorProgramming_Gro_en/assets/160735287/294d0f9f-e06d-42e7-b39d-68803bccb1bc">
+
 The model takes as input : 
 
 - ***AI-2 by UPEC*** : a quorum sensing (QS) molecule used by commensal E.Coli and UPEC. The goal was to knowk-out the AI-2 producing genes in commensal E.Coli so that the only bacteria producing AI-2 are the ones causing the infection, UPEC. The programmed bacteria, commensal E.Coli, could detect this QS molecule and so detect the presence of UPEC
@@ -20,8 +22,7 @@ The model gives as output a risk factor. As a first approach, this risk factor i
 - 2 risk factors detected : Risk = 2, blue fluorescence
 - 3 risk factors detected : Risk = 3, yellow fluorescence
 - 4 risk factors detected : Risk = 4, red fluorescence
-<img width="687" alt="Inputs-outputs" src="https://github.com/Selena-JM/BacteriaBehaviorProgramming_Gro_en/assets/160735287/294d0f9f-e06d-42e7-b39d-68803bccb1bc">
 
 ## The files 
 ### InfectionDetection.gro
-Latest gro script to simulate the infection detection. It 
+Latest gro script to simulate the infection detection.
