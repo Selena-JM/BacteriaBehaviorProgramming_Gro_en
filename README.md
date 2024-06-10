@@ -38,7 +38,7 @@ This script executes a predefined simulation during which the risk factors incre
 ### InfectionDetection.gro
 Latest gro script, where the inputs are AI-2, QS, Siderophores, Toxins. One can choose whether to include toxins as an input with the parameter 'number_inputs' : if set to 4 then all the inputs are kepts, if set to 3 then the toxins are not considered as an input since they are not possible to include in a lab experiment. Only 3 and 4 are accepted values for 'number_inputs'. 
 
-The QS input is actually a signal emitted by the bacteria, if the envrionment is favorable then the function "favorable" is called with input 1 and the bacteria will grow better and thus producing more of this signal. If the function favorable is called with the input 0 then the bacteria will not grow as much and thus produce less of this signal, thus simulating a less favorable envrionment. 
+The QS input is actually a signal emitted by the bacteria, if the environment is favorable then the function "favorable" is called with input 1 and the bacteria will grow better and thus producing more of this signal. If the function favorable is called with the input 0 then the bacteria will not grow as much and thus produce less of this signal, thus simulating a less favorable environment. 
 
 The risk in output is the number of risk factor detected, as in the previous script Old_InfectionDetection.gro. In this script, the input-output association is more effecient since there is no need to write the whole truth table : the sum of detected inputs is computed and the adequate fluorescence is shown.
 
