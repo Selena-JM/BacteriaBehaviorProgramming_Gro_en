@@ -4,15 +4,13 @@ chemostat ( true );
 set ( "chemostat_width", 500);
 set ( "chemostat_height", 500 );
 
-// Neural network parameters
-// To complete
-
 // Gro parameters
 environment:={0,0,0,0};
 fp := fopen ( "output_response.csv", "w" );
 detection :=0.15;
 urea_range:={0.50,1.50} ; //To complete, in M {0.0083,0.025}
 color_level := 1000;
+
 // Environmental model simulating the presence of infection factors or not
 // 
 // qs: AI-2 (quorum sensing); u: urea;
@@ -21,25 +19,28 @@ qs := signal(4, 0.1);
 toxins := signal(4, 0.1);
 sider := signal(4, 0.1);
 urea := signal(0, 0); 
+
 //Selection function to compare to urea range
 fun comparative g r .
   if g-r[0]>0 & g-r[1]<0 
     then 1
     else 0
   end;
+
 // Bacterial behavior model
 //behavior:= {0,0,0,0};
 behavior := 0;
+
 fun data L .
   ( sumlist L ) / color_level;
+
 // Detection function 
 fun detect i .
   if i > detection
     then 1
     else 0
   end;
-// Biological responses 
-// To complete
+
 //Artificial neural network program
 // Risk 0 : no fluorescence
 // Risk 1 : gfp
